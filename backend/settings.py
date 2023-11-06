@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'usuarios'
+    'usuarios',
+    'gestor_finanzas'
 ]
 
 MIDDLEWARE = [

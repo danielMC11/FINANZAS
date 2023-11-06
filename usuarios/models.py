@@ -18,7 +18,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 	nombres = models.CharField(max_length=50)
 	apellidos = models.CharField(max_length=50)
 	USERNAME_FIELD = 'email'
-	REQUIRED_FIELDS = ['nombres', 'apellidos']
 
 	objects = AdminUsuarios()
 

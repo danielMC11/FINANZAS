@@ -4,8 +4,8 @@ from django.utils import timezone
 
 class CarteraUsuario(models.Model):
     cu_id = models.CharField(max_length=10, primary_key=True)
-    u_id = models.OneToOneField(Usuario, on_delete=models.CASCADE)
-    saldo = models.FloatField
+    u_id = models.OneToOneField(Usuario, on_delete=models.CASCADE, db_column='u_id')
+    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     divisa = models.CharField(max_length=3)
 
 class CategoriasGasto(models.Model):
@@ -15,7 +15,7 @@ class CategoriasGasto(models.Model):
 class SubcategoriasGasto(models.Model):
     scg_id = models.CharField(max_length=10, primary_key=True)
     nom_scg = models.CharField(max_length=20)
-    cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT)
+    cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT, db_column='cg_id')
 
 class CategoriasIngreso(models.Model):
     ci_id = models.CharField(max_length=10, primary_key=True)
@@ -24,20 +24,7 @@ class CategoriasIngreso(models.Model):
 class SubcategoriasIngreso(models.Model):
     sci_id = models.CharField(max_length=10, primary_key=True)
     nom_sci = models.CharField(max_length=20)
-    ci_id = models.ForeignKey(CategoriasIngreso, on_delete=models.PROTECT)
-
-class DetalleGasto(models.Model):
-    dg_id = models.CharField(max_length=10, primary_key=True)
-    o_id = models.OneToOneField("OperacionesUsuario", on_delete=models.PROTECT)
-    etiqueta = models.CharField(max_length=30)
-    subsidiado = models.BooleanField(default=False)
-    scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT)
-
-class DetalleIngreso(models.Model):
-    di_id = models.CharField(max_length=10, primary_key=True)
-    o_id = models.OneToOneField("OperacionesUsuario", on_delete=models.PROTECT)
-    etiqueta = models.CharField(max_length=30)
-    sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT)
+    ci_id = models.ForeignKey(CategoriasIngreso, on_delete=models.PROTECT, db_column='ci_id')
 
 class TipoOperacion(models.Model):
     to_id = models.CharField(max_length=3, primary_key=True)
@@ -45,23 +32,23 @@ class TipoOperacion(models.Model):
 
 class OperacionesUsuario(models.Model):
     o_id = models.CharField(max_length=10, primary_key=True)
-    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE)
-    to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT)
-    cantidad = models.FloatField
-    fecha = models.DateTimeField(default=timezone.now())
+    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE, db_column='cu_id')
+    to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fecha = models.DateTimeField(default=timezone.now)
 
-class DetalleGastoProgramado(models.Model):
-    dgp_id = models.CharField(max_length=10, primary_key=True)
-    o_id = models.OneToOneField("OperacionesUsuarioProgramadas", on_delete=models.PROTECT)
+class DetalleGasto(models.Model):
+    dg_id = models.CharField(max_length=10, primary_key=True)
+    o_id = models.OneToOneField(OperacionesUsuario, on_delete=models.PROTECT, db_column='o_id')
     etiqueta = models.CharField(max_length=30)
     subsidiado = models.BooleanField(default=False)
-    scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT)
+    scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT, db_column='scg_id')
 
-class DetalleIngresoProgramado(models.Model):
-    dip_id = models.CharField(max_length=10, primary_key=True)
-    op_id = models.OneToOneField("OperacionesUsuarioProgramadas", on_delete=models.PROTECT)
+class DetalleIngreso(models.Model):
+    di_id = models.CharField(max_length=10, primary_key=True)
+    o_id = models.OneToOneField(OperacionesUsuario, on_delete=models.PROTECT, db_column='o_id')
     etiqueta = models.CharField(max_length=30)
-    sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT)
+    sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT, db_column='sci_id')
 
 class OperacionesUsuarioProgramadas(models.Model):
 
@@ -85,29 +72,43 @@ class OperacionesUsuarioProgramadas(models.Model):
 
 
     op_id = models.CharField(max_length=10, primary_key=True)
-    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE)
-    to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT)
-    cantidad = models.FloatField
-    fecha = models.DateTimeField(default=timezone.now())
+    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.PROTECT, db_column='cu_id')
+    to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fecha = models.DateTimeField(default=timezone.now)
 
     dia = models.TextField(choices=DIAS_DE_LA_SEMANA)
     hora = models.TimeField
     activo = models.BooleanField(default=True)
 
+class DetalleGastoProgramado(models.Model):
+    dgp_id = models.CharField(max_length=10, primary_key=True)
+    op_id = models.OneToOneField(OperacionesUsuarioProgramadas, on_delete=models.PROTECT, db_column='op_id')
+    etiqueta = models.CharField(max_length=30)
+    subsidiado = models.BooleanField(default=False)
+    scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT, db_column='scg_id')
+
+class DetalleIngresoProgramado(models.Model):
+    dip_id = models.CharField(max_length=10, primary_key=True)
+    op_id = models.OneToOneField(OperacionesUsuarioProgramadas, on_delete=models.PROTECT, db_column='op_id')
+    etiqueta = models.CharField(max_length=30)
+    sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT, db_column='sci_id')
+
+
 class PlanesGasto(models.Model):
     pg_id = models.CharField(max_length=20, primary_key=True)
-    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE)
+    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.PROTECT, db_column='op_id')
     etiqueta = models.CharField(max_length=30)
-    cantidad = models.FloatField
-    cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT)
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT, db_column='cg_id')
     fecha_inicio = models.DateField
     fecha_fin = models.DateField
     porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 
 class HistoricoPlanesGasto(models.Model):
     hpg_id = models.CharField(max_length=20, primary_key=True)
-    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE)
+    cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.PROTECT, db_column='cu_id')
     etiqueta = models.CharField(max_length=30)
-    cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT)
-    porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
+    cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT, db_column='cg_id')
+    porcentaje = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     exito = models.BooleanField     
