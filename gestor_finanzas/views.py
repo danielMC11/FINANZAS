@@ -22,6 +22,9 @@ class CrearCartera(APIView):
         )
 		serializer = SerializadorCarteraUsuario(cartera, many = False)
 		return Response(serializer.data)
+	
+
+
 
 
 
