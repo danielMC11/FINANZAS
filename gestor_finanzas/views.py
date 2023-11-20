@@ -11,20 +11,43 @@ class CrearCartera(APIView):
 	authentication_classes = (SessionAuthentication,)
 	
 	def post(self, request):
-		data = request.data
-		usr = request.user.u_id
-		usuario = Usuario.objects.get(pk=usr)
-		cartera = CarteraUsuario.objects.create(
-			cu_id = data['cu_id'],
-			u_id = usuario,
-			saldo = data['saldo'],
-			divisa = data['divisa']
-        )
-		serializer = SerializadorCarteraUsuario(cartera, many = False)
-		return Response(serializer.data)
-	
+		datos = request.data
+		serializer = SerializadorCarteraUsuario(data=datos, many = False)
+		
+		if serializer.is_valid(raise_exception=True):
+			cartera = serializer.create(datos, request.user.u_id)
+			if cartera:
+				return Response(serializer.data)
+		return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class RegistrarOperacionIngreso(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def post(self, request):
+		datos = request.data
+		serializer = SerializadorOperacionesUsuarioIngreso(data=datos, many = False)
+
+		if serializer.is_valid(raise_exception=True):
+			operacion = serializer.create(datos, request.user.u_id)
+		if operacion:
+				return Response(serializer.data)
+		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class RegistrarOperacionGasto(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def post(self, request):
+		datos = request.data
+		serializer = SerializadorOperacionesUsuarioGasto(data=datos, many = False)
+
+		if serializer.is_valid(raise_exception=True):
+			operacion = serializer.create(datos, request.user.u_id)
+		if operacion:
+				return Response(serializer.data)
+		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 

@@ -23,3 +23,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
 	def __str__(self):
 		return f'{self.nombres} {self.apellidos}'
+	
+	class Meta:
+		db_table = 'usuarios'
