@@ -15,6 +15,7 @@ class CarteraUsuario(models.Model):
             self.cu_id = f"cu{CarteraUsuario.objects.count() + 1}"
         return super().save(*args, **kwargs)
 
+
     class Meta:
         db_table = 'cartera_usuario'
 

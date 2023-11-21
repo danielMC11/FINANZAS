@@ -12,10 +12,10 @@ class CrearCartera(APIView):
 	
 	def post(self, request):
 		datos = request.data
-		serializer = SerializadorCarteraUsuario(data=datos, many = False)
+		serializer = SerializadorCarteraUsuario(data=datos, context={'request': request}, many = False)
 		
 		if serializer.is_valid(raise_exception=True):
-			cartera = serializer.create(datos, request.user.u_id)
+			cartera = serializer.create(datos)
 			if cartera:
 				return Response(serializer.data)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -26,10 +26,10 @@ class RegistrarOperacionIngreso(APIView):
 
 	def post(self, request):
 		datos = request.data
-		serializer = SerializadorOperacionesUsuarioIngreso(data=datos, many = False)
+		serializer = SerializadorOperacionesUsuarioIngreso(data=datos, context={'request': request}, many = False)
 
 		if serializer.is_valid(raise_exception=True):
-			operacion = serializer.create(datos, request.user.u_id)
+			operacion = serializer.create(datos)
 		if operacion:
 				return Response(serializer.data)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -41,10 +41,10 @@ class RegistrarOperacionGasto(APIView):
 
 	def post(self, request):
 		datos = request.data
-		serializer = SerializadorOperacionesUsuarioGasto(data=datos, many = False)
+		serializer = SerializadorOperacionesUsuarioGasto(data=datos, context={'request': request}, many = False)
 
 		if serializer.is_valid(raise_exception=True):
-			operacion = serializer.create(datos, request.user.u_id)
+			operacion = serializer.create(datos)
 		if operacion:
 				return Response(serializer.data)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
