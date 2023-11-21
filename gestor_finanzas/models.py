@@ -2,11 +2,18 @@ from django.db import models
 from usuarios.models import Usuario
 from django.utils import timezone
 
+
+
 class CarteraUsuario(models.Model):
     cu_id = models.CharField(max_length=10, primary_key=True)
     u_id = models.OneToOneField(Usuario, on_delete=models.CASCADE, db_column='u_id')
     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     divisa = models.CharField(max_length=3)
+
+    def save(self, *args, **kwargs):
+        if not self.cu_id:
+            self.cu_id = f"cu{CarteraUsuario.objects.count() + 1}"
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'cartera_usuario'
@@ -14,25 +21,6 @@ class CarteraUsuario(models.Model):
 class CategoriasGasto(models.Model):
     cg_id = models.CharField(max_length=10, primary_key=True, unique=True)
     nom_cg = models.CharField(max_length=50)
-
-    @staticmethod
-    def gen_id():
-        n = 1
-        while True:
-            yield n
-            n += 1
-    
-    g = gen_id()
-
-    @classmethod
-    def next_id(cls):
-        return 'cg' + str(next(cls.g))
-    
-    @classmethod
-    def create(cls, nom_cg):
-        obj = cls(cg_id=cls.next_id(), nom_cg=nom_cg)
-        obj.save()
-        return obj 
     
     class Meta:
         db_table = 'categorias_gasto'
@@ -75,6 +63,11 @@ class OperacionesUsuario(models.Model):
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha = models.DateTimeField(default=timezone.now)
 
+    def save(self, *args, **kwargs):
+        if not self.o_id:
+            self.o_id = f"o{OperacionesUsuario.objects.count() + 1}"
+        return super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'operaciones_usuario'
 
@@ -83,6 +76,11 @@ class DetalleGasto(models.Model):
     o_id = models.OneToOneField(OperacionesUsuario, on_delete=models.PROTECT, db_column='o_id')
     etiqueta = models.CharField(max_length=50)
     scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT, db_column='scg_id')
+
+    def save(self, *args, **kwargs):
+        if not self.dg_id:
+            self.dg_id = f"dg{DetalleGasto.objects.count() + 1}"
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'detalle_gasto'
@@ -93,6 +91,11 @@ class DetalleIngreso(models.Model):
     etiqueta = models.CharField(max_length=50)
     sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT, db_column='sci_id')
 
+    def save(self, *args, **kwargs):
+        if not self.di_id:
+            self.di_id = f"di{DetalleIngreso.objects.count() + 1}"
+        return super().save(*args, **kwargs)
+    
     class Meta:
         db_table = 'detalle_ingreso'
 
@@ -107,6 +110,11 @@ class OperacionesUsuarioProgramadas(models.Model):
     hora = models.TimeField
     activo = models.BooleanField(default=True)
 
+    def save(self, *args, **kwargs):
+        if not self.op_id:
+            self.op_id = f"op{OperacionesUsuarioProgramadas.objects.count() + 1}"
+        return super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'operaciones_usuario_programadas'
 
@@ -119,6 +127,11 @@ class DetalleGastoProgramado(models.Model):
     subsidiado = models.BooleanField(default=False)
     scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT, db_column='scg_id')
 
+    def save(self, *args, **kwargs):
+        if not self.dgp_id:
+            self.dgp_id = f"dgp{DetalleGastoProgramado.objects.count() + 1}"
+        return super().save(*args, **kwargs)
+    
     class Meta:
         db_table = 'detalle_gasto_programado'
 
@@ -128,6 +141,11 @@ class DetalleIngresoProgramado(models.Model):
     etiqueta = models.CharField(max_length=50)
     sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT, db_column='sci_id')
 
+    def save(self, *args, **kwargs):
+        if not self.dip_id:
+            self.dip_id = f"dip{DetalleIngresoProgramado.objects.count() + 1}"
+        return super().save(*args, **kwargs)
+    
     class Meta:
         db_table = 'detalle_ingreso_programado'
 
@@ -141,7 +159,11 @@ class ProyeccionesFinancieras(models.Model):
     cantidad_proyeccion = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     cantidad_progreso = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-
+    def save(self, *args, **kwargs):
+        if not self.pf_id:
+            self.pf_id = f"pf{ProyeccionesFinancieras.objects.count() + 1}"
+        return super().save(*args, **kwargs)
+    
     class Meta:
         db_table = 'proyecciones_financieras'
 
@@ -154,6 +176,11 @@ class HistoricoProyeccionesFinancieras(models.Model):
     fecha_fin = models.DateField
     cantidad_proyeccion = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     cantidad_final = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.hpf_id:
+            self.hpf_id = f"hpf{HistoricoProyeccionesFinancieras.objects.count() + 1}"
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'historico_proyecciones_financieras'

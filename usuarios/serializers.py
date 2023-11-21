@@ -7,7 +7,7 @@ UserModel = get_user_model()
 class SerializadorRegistroUsuario(serializers.ModelSerializer):
 	class Meta:
 		model = UserModel
-		fields = '__all__'
+		fields = ('email', 'nombres', 'apellidos')
 	def crear(self, datos):
 		obj_usuario = UserModel.objects.crear_usuario(email=datos['email'], password=datos['password'])
 		obj_usuario.nombres = datos['nombres']
@@ -28,7 +28,7 @@ class SeralizadorLoginUsuario(serializers.Serializer):
 class SerializadorUsuario(serializers.ModelSerializer):
 	class Meta:
 		model = UserModel
-		fields = ('u_id', 'email', 'nombres', 'apellidos')
+		fields = ('u_id','email', 'nombres', 'apellidos')
 
 
 
