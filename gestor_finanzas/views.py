@@ -58,5 +58,13 @@ class VisualizarExtractos(APIView):
 		serializer = SerializadorExtractos(extractos, many=True)
 		return Response(serializer.data)
 
+class VisualizarExtractoDetalleIngreso(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def get(self, request, o_id):
+		detalle_extracto_ingreso = OperacionesUsuario.extracto_detalle_ingreso(request.user.u_id, o_id)
+		serializer = SerializadorExtractoDetalleIngreso(detalle_extracto_ingreso, many=False)
+		return Response(serializer.data)
 
 		

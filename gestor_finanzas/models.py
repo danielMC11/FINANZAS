@@ -72,14 +72,27 @@ class OperacionesUsuario(models.Model):
     def extractos_operaciones(cls, u_id):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         extractos = cls.objects.raw(''' 
-		select o_id, cantidad, nom_to as tipo_operacion, divisa, fecha from 
-		operaciones_usuario join cartera_usuario using(cu_id) 
-		join tipo_operacion using(to_id) 
-		where o_id = (select o_id from detalle_ingreso) or 
-		o_id = (select o_id from detalle_gasto) and cu_id = %s
+		select o_id, cantidad, nom_to as tipo_operacion, cantidad, divisa, fecha from operaciones_usuario
+        join cartera_usuario using(cu_id) join usuarios using(u_id) join
+        tipo_operacion using(to_id) where cu_id=%s and 
+        (o_id in (select o_id from detalle_ingreso) or o_id in (select o_id from detalle_gasto))
 		''', [cartera.cu_id])
 
         return extractos
+    #  cantidad, nom_to, etiqueta, nom_sci, nom._0
+    # .ci, divisa, fecha 
+
+    @classmethod
+    def extracto_detalle_ingreso(cls, u_id, o_id):
+        cartera=CarteraUsuario.objects.get(u_id=u_id)
+        detalle_extracto = cls.objects.raw('''
+        select o_id, cantidad, nom_to as tipo_operacion, etiqueta, nom_sci as subcategoria_ingreso, nom_ci as categoria_ingreso, divisa, fecha  from
+        operaciones_usuario join cartera_usuario using(cu_id) join tipo_operacion using(to_id)
+        join detalle_ingreso using(o_id) join subcategorias_ingreso using(sci_id) join categorias_ingreso
+        using(ci_id) where  cu_id = %s and o_id=%s LIMIT 1
+		''', [cartera.cu_id, o_id])
+
+        return list(detalle_extracto)[0]
         
     class Meta:
         db_table = 'operaciones_usuario'

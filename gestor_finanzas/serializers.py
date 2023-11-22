@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import *
 
@@ -115,5 +116,18 @@ class SerializadorExtractos(serializers.Serializer):
     divisa = serializers.CharField(max_length=3)
     fecha = serializers.DateTimeField()
 
+    class Meta:
+        fields = ('o_id', 'cantidad', 'tipo_operacion', 'divisa', 'fecha')
 
+class SerializadorExtractoDetalleIngreso(serializers.Serializer):
+    o_id = serializers.CharField(max_length=10)
+    cantidad = serializers.DecimalField(max_digits=10, decimal_places=2)
+    tipo_operacion = serializers.CharField(max_length=30)
+    etiqueta= serializers.CharField(max_length=50)
+    subcategoria_ingreso = serializers.CharField(max_length=50)
+    categoria_ingreso = serializers.CharField(max_length=50)
+    divisa = serializers.CharField(max_length=3)
+    fecha = serializers.DateTimeField()
 
+    class Meta:
+        fields = ('o_id', 'cantidad', 'tipo_operacion', 'etiqueta', 'subcategoria_ingreso', 'categoria_ingreso', 'divisa', 'fecha')
