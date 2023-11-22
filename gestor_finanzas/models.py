@@ -68,7 +68,19 @@ class OperacionesUsuario(models.Model):
         if not self.o_id:
             self.o_id = f"o{OperacionesUsuario.objects.count() + 1}"
         return super().save(*args, **kwargs)
+    @classmethod
+    def extractos_operaciones(cls, u_id):
+        cartera=CarteraUsuario.objects.get(u_id=u_id)
+        extractos = cls.objects.raw(''' 
+		select o_id, cantidad, nom_to as tipo_operacion, divisa, fecha from 
+		operaciones_usuario join cartera_usuario using(cu_id) 
+		join tipo_operacion using(to_id) 
+		where o_id = (select o_id from detalle_ingreso) or 
+		o_id = (select o_id from detalle_gasto) and cu_id = %s
+		''', [cartera.cu_id])
 
+        return extractos
+        
     class Meta:
         db_table = 'operaciones_usuario'
 

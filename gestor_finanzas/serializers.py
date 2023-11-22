@@ -106,4 +106,14 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
         operacion.save()
 
         return operacion
-    
+
+
+class SerializadorExtractos(serializers.Serializer):
+    o_id = serializers.CharField(max_length=10)
+    cantidad = serializers.DecimalField(max_digits=10, decimal_places=2)
+    tipo_operacion = serializers.CharField(max_length=30)
+    divisa = serializers.CharField(max_length=3)
+    fecha = serializers.DateTimeField()
+
+
+

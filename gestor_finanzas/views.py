@@ -49,8 +49,14 @@ class RegistrarOperacionGasto(APIView):
 				return Response(serializer.data)
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
+class VisualizarExtractos(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
 
-
+	def get(self, request):
+		extractos = OperacionesUsuario.extractos_operaciones(request.user.u_id)
+		serializer = SerializadorExtractos(extractos, many=True)
+		return Response(serializer.data)
 
 
 		
