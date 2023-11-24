@@ -131,3 +131,16 @@ class SerializadorExtractoDetalleIngreso(serializers.Serializer):
 
     class Meta:
         fields = ('o_id', 'cantidad', 'tipo_operacion', 'etiqueta', 'subcategoria_ingreso', 'categoria_ingreso', 'divisa', 'fecha')
+
+class SerializadorExtractoDetalleGasto(serializers.Serializer):
+    o_id = serializers.CharField(max_length=10)
+    cantidad = serializers.DecimalField(max_digits=10, decimal_places=2)
+    tipo_operacion = serializers.CharField(max_length=30)
+    etiqueta= serializers.CharField(max_length=50)
+    subcategoria_gasto = serializers.CharField(max_length=50)
+    categoria_gasto = serializers.CharField(max_length=50)
+    divisa = serializers.CharField(max_length=3)
+    fecha = serializers.DateTimeField()
+
+    class Meta:
+        fields = ('o_id', 'cantidad', 'tipo_operacion', 'etiqueta', 'subcategoria_gasto', 'categoria_gasto', 'divisa', 'fecha')

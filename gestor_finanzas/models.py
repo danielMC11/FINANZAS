@@ -86,14 +86,26 @@ class OperacionesUsuario(models.Model):
     def extracto_detalle_ingreso(cls, u_id, o_id):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         detalle_extracto = cls.objects.raw('''
-        select o_id, cantidad, nom_to as tipo_operacion, etiqueta, nom_sci as subcategoria_ingreso, nom_ci as categoria_ingreso, divisa, fecha  from
+        select o_id, cantidad, nom_to as tipo_operacion, etiqueta, nom_scg as subcategoria_gasto, nom_cg as categoria_gasto, divisa, fecha  from
         operaciones_usuario join cartera_usuario using(cu_id) join tipo_operacion using(to_id)
-        join detalle_ingreso using(o_id) join subcategorias_ingreso using(sci_id) join categorias_ingreso
-        using(ci_id) where  cu_id = %s and o_id=%s LIMIT 1
+        join detalle_gasto using(o_id) join subcategorias_gasto using(scg_id) join categorias_gasto
+        using(cg_id) where cu_id=%s and o_id=%s LIMIT 1
 		''', [cartera.cu_id, o_id])
 
         return list(detalle_extracto)[0]
-        
+    
+    @classmethod
+    def extracto_detalle_gasto(cls, u_id, o_id):
+        cartera=CarteraUsuario.objects.get(u_id=u_id)
+        detalle_extracto = cls.objects.raw('''
+        select o_id, cantidad, nom_to as tipo_operacion, etiqueta, nom_scg as subcategoria_gasto, nom_cg as categoria_gasto, divisa, fecha  from
+        operaciones_usuario join cartera_usuario using(cu_id) join tipo_operacion using(to_id)
+        join detalle_gasto using(o_id) join subcategorias_gasto using(scg_id) join categorias_gasto
+        using(cg_id) where  cu_id = %s and o_id=%s LIMIT 1
+		''', [cartera.cu_id, o_id])
+
+        return list(detalle_extracto)[0]
+    
     class Meta:
         db_table = 'operaciones_usuario'
 
