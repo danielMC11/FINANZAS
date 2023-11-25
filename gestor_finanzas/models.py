@@ -73,7 +73,7 @@ class OperacionesUsuario(models.Model):
     cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE, db_column='cu_id')
     to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fecha = models.DateTimeField(default=timezone.now)
+    fecha = models.DateTimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
 
     def save(self, *args, **kwargs):
         if not self.o_id:
@@ -148,15 +148,21 @@ class DetalleIngreso(models.Model):
     class Meta:
         db_table = 'detalle_ingreso'
 
+class DiaSemana(models.Model):
+    d_id = models.CharField(max_length=10, primary_key=True)
+    nom_dia = models.CharField(max_length=30)
+
+    class Meta:
+        db_table = 'dia_semana'
+
 class OperacionesUsuarioProgramadas(models.Model):
-
-
     op_id = models.CharField(max_length=10, primary_key=True)
     cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.PROTECT, db_column='cu_id')
     to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fecha = models.DateTimeField(default=timezone.now)
+    fecha = models.DateTimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
     hora = models.TimeField
+    dias = models.ManyToManyField(DiaSemana)
     activo = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
