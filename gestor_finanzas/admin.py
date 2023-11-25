@@ -1,4 +1,4 @@
-from django.contrib import admin
+"""from django.contrib import admin
 from .models import CarteraUsuario, OperacionesUsuario, DetalleGasto, DetalleIngreso, OperacionesUsuarioProgramadas, DetalleGastoProgramado, DetalleIngresoProgramado
 
 
@@ -53,3 +53,4 @@ class OperacionesProgramadasAdmin(admin.ModelAdmin):
         elif operacion == 'gasto':
             cartera.saldo -= cantidad
         cartera.save()
+"""

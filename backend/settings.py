@@ -25,7 +25,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'usuarios',
-    'gestor_finanzas'
+    'gestor_cartera',
+    'gestor_operaciones',
+    'gestor_operaciones_programadas'
 ]
 
 MIDDLEWARE = [
