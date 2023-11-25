@@ -15,6 +15,8 @@ class CarteraUsuario(models.Model):
             self.cu_id = f"cu{CarteraUsuario.objects.count() + 1}"
         return super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'{self.u_id.nombres} / {self.u_id.email} / {self.cu_id}'
 
     class Meta:
         db_table = 'cartera_usuario'
@@ -30,6 +32,9 @@ class SubcategoriasGasto(models.Model):
     scg_id = models.CharField(max_length=10, primary_key=True)
     nom_scg = models.CharField(max_length=50)
     cg_id = models.ForeignKey(CategoriasGasto, on_delete=models.PROTECT, db_column='cg_id')
+
+    def __str__(self):
+        return f'{self.nom_scg} ({self.cg_id.nom_cg})'
 
     class Meta:
         db_table = 'subcategorias_gasto'
@@ -47,12 +52,18 @@ class SubcategoriasIngreso(models.Model):
     nom_sci = models.CharField(max_length=50)
     ci_id = models.ForeignKey(CategoriasIngreso, on_delete=models.PROTECT, db_column='ci_id')
 
+    def __str__(self):
+        return f'{self.nom_sci} ({self.ci_id.nom_ci})'
+    
     class Meta:
         db_table = 'subcategorias_ingreso'
 
 class TipoOperacion(models.Model):
     to_id = models.CharField(max_length=3, primary_key=True)
     nom_to = models.CharField(max_length=30)
+
+    def __str__(self):
+        return f'{self.nom_to}'
 
     class Meta:
         db_table = 'tipo_operacion'
