@@ -65,9 +65,7 @@ class OperacionesUsuario(models.Model):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         extractos = cls.objects.raw(''' 
 		select o_id, cantidad, nom_to as tipo_operacion, cantidad, divisa, fecha from operaciones_usuario
-        join cartera_usuario using(cu_id) join usuarios using(u_id) join
-        tipo_operacion using(to_id) where cu_id=%s and 
-        (o_id in (select o_id from detalle_ingreso) or o_id in (select o_id from detalle_gasto))
+        join cartera_usuario using(cu_id) join tipo_operacion using(to_id) where cu_id=%s
 		''', [cartera.cu_id])
 
         return extractos
