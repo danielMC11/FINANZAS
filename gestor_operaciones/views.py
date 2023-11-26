@@ -49,7 +49,7 @@ class VisualizarExtractoDetalleIngreso(APIView):
 	authentication_classes = (SessionAuthentication,)
 
 	def get(self, request, o_id):
-		detalle_extracto_ingreso = OperacionesUsuario.extracto_detalle_ingreso(request.user.u_id, o_id)
+		detalle_extracto_ingreso = OperacionesUsuario.extracto_detalle(request.user.u_id, o_id)
 		serializer = SerializadorExtractoDetalleIngreso(detalle_extracto_ingreso, many=False)
 		return Response(serializer.data)
 	
@@ -58,6 +58,6 @@ class VisualizarExtractoDetalleGasto(APIView):
 	authentication_classes = (SessionAuthentication,)
 
 	def get(self, request, o_id):
-		detalle_extracto_gasto = OperacionesUsuario.extracto_detalle_gasto(request.user.u_id, o_id)
+		detalle_extracto_gasto = OperacionesUsuario.extracto_detalle(request.user.u_id, o_id)
 		serializer = SerializadorExtractoDetalleGasto(detalle_extracto_gasto, many=False)
 		return Response(serializer.data)

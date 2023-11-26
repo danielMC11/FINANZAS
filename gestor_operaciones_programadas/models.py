@@ -15,8 +15,10 @@ class OperacionesUsuarioProgramadas(models.Model):
     cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.PROTECT, db_column='cu_id')
     to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fecha = models.DateTimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
-    hora = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
+    etiqueta = models.CharField(max_length=50, default='')
+    fecha_operacion = models.DateField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
+    hora_operacion = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
+    hora_programada = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
     dias = models.ManyToManyField(DiaSemana)
     activo = models.BooleanField(default=True)
 
@@ -33,7 +35,6 @@ class OperacionesUsuarioProgramadas(models.Model):
 class DetalleGastoProgramado(models.Model):
     dgp_id = models.CharField(max_length=10, primary_key=True)
     op_id = models.OneToOneField(OperacionesUsuarioProgramadas, on_delete=models.PROTECT, db_column='op_id')
-    etiqueta = models.CharField(max_length=50)
     scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT, db_column='scg_id')
 
     def save(self, *args, **kwargs):
@@ -47,7 +48,6 @@ class DetalleGastoProgramado(models.Model):
 class DetalleIngresoProgramado(models.Model):
     dip_id = models.CharField(max_length=10, primary_key=True)
     op_id = models.OneToOneField(OperacionesUsuarioProgramadas, on_delete=models.PROTECT, db_column='op_id')
-    etiqueta = models.CharField(max_length=50)
     sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT, db_column='sci_id')
 
     def save(self, *args, **kwargs):

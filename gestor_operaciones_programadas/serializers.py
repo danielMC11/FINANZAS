@@ -9,7 +9,7 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
 
     class Meta:
         model = OperacionesUsuarioProgramadas
-        fields = ['to_id', 'cantidad', 'hora', 'dias', 'detalle_ingreso']
+        fields = ['to_id', 'cantidad', 'etiqueta', 'hora', 'dias', 'detalle_ingreso']
 
     
     def validate_cantidad(self, value):
@@ -25,6 +25,7 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
         cu_id = cu_id,
         to_id = to_id,
         cantidad = validated_data['cantidad'],
+        etiqueta = validated_data['etiqueta'],
         hora = validated_data['hora']
         )
 
@@ -35,7 +36,6 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
         sci_id=SubcategoriasIngreso.objects.get(pk=detalle_ingreso_data['sci_id'])
         DetalleIngresoProgramado.objects.create(
         op_id=operacion_programada,
-        etiqueta = detalle_ingreso_data['etiqueta'],
         sci_id = sci_id
         )
         
@@ -50,7 +50,7 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
 
     class Meta:
         model = OperacionesUsuarioProgramadas
-        fields = ['to_id', 'cantidad', 'hora', 'dias', 'detalle_gasto']
+        fields = ['to_id', 'cantidad', 'etiqueta', 'fecha_operacion', 'hora_operacion', 'hora_programada', 'dias', 'detalle_gasto']
 
     
     def validate_cantidad(self, value):
@@ -66,7 +66,10 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
         cu_id = cu_id,
         to_id = to_id,
         cantidad = validated_data['cantidad'],
-        hora = validated_data['hora']
+        etiqueta = validated_data['etiqueta'],
+        fecha_operacion = validated_data['fecha_operacion'],
+        hora_operacion = validated_data['hora_programada'],
+        hora_generacion = validated_data['hora_generacion']
         )
 
         query_set_dias = DiaSemana.objects.filter(d_id__in=validated_data['dias'])
@@ -76,7 +79,6 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
         scg_id=SubcategoriasGasto.objects.get(pk=detalle_gasto_data['scg_id'])
         DetalleGastoProgramado.objects.create(
         op_id=operacion_programada,
-        etiqueta = detalle_gasto_data['etiqueta'],
         scg_id = scg_id
         )
         

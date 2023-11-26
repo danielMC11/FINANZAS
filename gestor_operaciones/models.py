@@ -54,55 +54,30 @@ class OperacionesUsuario(models.Model):
     cu_id = models.ForeignKey(CarteraUsuario, on_delete=models.CASCADE, db_column='cu_id')
     to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fecha = models.DateTimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
-
+    etiqueta = models.CharField(max_length=50, default='')
+    fecha_operacion = models.DateField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
+    hora_operacion = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
     def save(self, *args, **kwargs):
         if not self.o_id:
             self.o_id = f"o{OperacionesUsuario.objects.count() + 1}"
         return super().save(*args, **kwargs)
+    
     @classmethod
     def extractos_operaciones(cls, u_id):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
-        extractos = cls.objects.raw(''' 
-		select o_id, cantidad, nom_to as tipo_operacion, cantidad, divisa, fecha from operaciones_usuario
-        join cartera_usuario using(cu_id) join tipo_operacion using(to_id) where cu_id=%s
-		''', [cartera.cu_id])
-
+        extractos = OperacionesUsuario.objects.filter(cu_id=cartera.cu_id)
         return extractos
-    #  cantidad, nom_to, etiqueta, nom_sci, nom._0
-    # .ci, divisa, fecha 
 
     @classmethod
-    def extracto_detalle_ingreso(cls, u_id, o_id):
+    def extracto_detalle(cls, u_id, o_id):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
-        detalle_extracto = cls.objects.raw('''
-        select o_id, cantidad, nom_to as tipo_operacion, etiqueta, nom_sci as subcategoria_ingreso, nom_ci as categoria_ingreso, divisa, fecha  from
-        operaciones_usuario join cartera_usuario using(cu_id) join tipo_operacion using(to_id)
-        join detalle_ingreso using(o_id) join subcategorias_ingreso using(sci_id) join categorias_ingreso
-        using(ci_id) where cu_id=%s and o_id=%s LIMIT 1
-		''', [cartera.cu_id, o_id])
+        detalle_extracto = OperacionesUsuario.objects.get(cu_id=cartera.cu_id, o_id=o_id)
+        return detalle_extracto
 
-        return list(detalle_extracto)[0]
-    
-    @classmethod
-    def extracto_detalle_gasto(cls, u_id, o_id):
-        cartera=CarteraUsuario.objects.get(u_id=u_id)
-        detalle_extracto = cls.objects.raw('''
-        select o_id, cantidad, nom_to as tipo_operacion, etiqueta, nom_scg as subcategoria_gasto, nom_cg as categoria_gasto, divisa, fecha  from
-        operaciones_usuario join cartera_usuario using(cu_id) join tipo_operacion using(to_id)
-        join detalle_gasto using(o_id) join subcategorias_gasto using(scg_id) join categorias_gasto
-        using(cg_id) where  cu_id = %s and o_id=%s LIMIT 1
-		''', [cartera.cu_id, o_id])
-
-        return list(detalle_extracto)[0]
-    
-    class Meta:
-        db_table = 'operaciones_usuario'
 
 class DetalleGasto(models.Model):
     dg_id = models.CharField(max_length=10, primary_key=True)
     o_id = models.OneToOneField(OperacionesUsuario, on_delete=models.PROTECT, db_column='o_id')
-    etiqueta = models.CharField(max_length=50)
     scg_id = models.ForeignKey(SubcategoriasGasto, on_delete=models.PROTECT, db_column='scg_id')
 
     def save(self, *args, **kwargs):
@@ -116,7 +91,6 @@ class DetalleGasto(models.Model):
 class DetalleIngreso(models.Model):
     di_id = models.CharField(max_length=10, primary_key=True)
     o_id = models.OneToOneField(OperacionesUsuario, on_delete=models.PROTECT, db_column='o_id')
-    etiqueta = models.CharField(max_length=50)
     sci_id = models.ForeignKey(SubcategoriasIngreso, on_delete=models.PROTECT, db_column='sci_id')
 
     def save(self, *args, **kwargs):
