@@ -6,6 +6,47 @@ from .serializers import *
 from .models import *
 
 
+
+class VisualizarCategoriasIngreso(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def get(self, request):
+		categorias = CategoriasIngreso.objects.all()
+		serializer = SerializadorCategoriasIngreso(categorias, many=True)
+		return Response(serializer.data)
+	
+
+class VisualizarSubcategoriasIngreso(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def get(self, request):
+		categorias = SubcategoriasIngreso.objects.all()
+		serializer = SerializadorSubcategoriasIngreso(categorias, many=True)
+		return Response(serializer.data)
+
+
+class VisualizarCategoriasGasto(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def get(self, request):
+		categorias = CategoriasGasto.objects.all()
+		serializer = SerializadorCategoriasGasto(categorias, many=True)
+		return Response(serializer.data)
+	
+
+class VisualizarSubcategoriasGasto(APIView):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+
+	def get(self, request):
+		categorias = SubcategoriasGasto.objects.all()
+		serializer = SerializadorSubcategoriasGasto(categorias, many=True)
+		return Response(serializer.data)
+	
+
 class RegistrarOperacionIngreso(APIView):
 	permission_classes = (permissions.IsAuthenticated,)
 	authentication_classes = (SessionAuthentication,)

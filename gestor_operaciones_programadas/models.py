@@ -2,6 +2,7 @@ from django.db import models
 from gestor_cartera.models import CarteraUsuario
 from gestor_operaciones.models import TipoOperacion, SubcategoriasGasto, SubcategoriasIngreso
 from django.utils import timezone
+import datetime
 
 class DiaSemana(models.Model):
     d_id = models.CharField(max_length=10, primary_key=True)
@@ -18,7 +19,8 @@ class OperacionesUsuarioProgramadas(models.Model):
     etiqueta = models.CharField(max_length=50, default='')
     fecha_operacion = models.DateField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
     hora_operacion = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
-    hora_programada = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
+    hora_programada_desde = models.TimeField()# default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
+    hora_programada_hasta = models.TimeField()# default=(datetime.datetime.combine(datetime.date.today(), timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0)) + datetime.timedelta(hours=6)).time())
     dias = models.ManyToManyField(DiaSemana)
     activo = models.BooleanField(default=True)
 
@@ -26,6 +28,12 @@ class OperacionesUsuarioProgramadas(models.Model):
         if not self.op_id:
             self.op_id = f"op{OperacionesUsuarioProgramadas.objects.count() + 1}"
         return super().save(*args, **kwargs)
+    
+    @classmethod
+    def extractos_operaciones(cls, u_id):
+        cartera=CarteraUsuario.objects.get(u_id=u_id)
+        extractos = OperacionesUsuarioProgramadas.objects.filter(cu_id=cartera.cu_id)
+        return extractos
 
     class Meta:
         db_table = 'operaciones_usuario_programadas'

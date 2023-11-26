@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import SerializadorRegistroUsuario, SeralizadorLoginUsuario, SerializadorUsuario
 from rest_framework import permissions, status
-
+from gestor_cartera.models import CarteraUsuario
+from django.core.exceptions import ObjectDoesNotExist
 
 class RegistroUsuario(APIView):
 	permission_classes = (permissions.AllowAny,)
@@ -28,7 +29,12 @@ class LoginUsuario(APIView):
 		if serializer.is_valid(raise_exception=True):
 			usuario = serializer.comprobar_usuario(datos)
 			login(request, usuario)
-			return Response(serializer.data, status=status.HTTP_200_OK)
+			try:
+				CarteraUsuario.objects.get(u_id=request.user.u_id)
+			except ObjectDoesNotExist:
+				return Response({'cartera': False}, status=status.HTTP_200_OK)
+			else:
+				return Response({'cartera': True}, status=status.HTTP_200_OK)
 
 
 class LogoutUsuario(APIView):

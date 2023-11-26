@@ -73,6 +73,9 @@ class OperacionesUsuario(models.Model):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         detalle_extracto = OperacionesUsuario.objects.get(cu_id=cartera.cu_id, o_id=o_id)
         return detalle_extracto
+    
+    class Meta:
+        db_table = 'operaciones_usuario'
 
 
 class DetalleGasto(models.Model):

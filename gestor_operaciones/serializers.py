@@ -2,6 +2,30 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import *
 
+
+
+
+class SerializadorCategoriasIngreso(serializers.ModelSerializer):
+    class Meta:
+        model = CategoriasIngreso
+        fields = '__all__'
+
+class SerializadorSubcategoriasIngreso(serializers.ModelSerializer):
+    class Meta:
+        model = SubcategoriasIngreso
+        fields = '__all__'
+
+class SerializadorCategoriasGasto(serializers.ModelSerializer):
+    class Meta:
+        model = CategoriasGasto
+        fields = '__all__'
+
+
+class SerializadorSubcategoriasGasto(serializers.ModelSerializer):
+    class Meta:
+        model = SubcategoriasGasto
+        fields = '__all__'
+
 class SerializadorDetalleIngreso(serializers.ModelSerializer):
     class Meta:
         model = DetalleIngreso

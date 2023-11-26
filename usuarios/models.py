@@ -37,6 +37,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 		if not self.u_id:
 			self.u_id = f"u{Usuario.objects.count() + 1}"
 		return super().save(*args, **kwargs)
+	@classmethod
+	def comprobar_usuario(cls):
+		pass
 	
 	def __str__(self):
 		return f'{self.nombres} / {self.email}'
