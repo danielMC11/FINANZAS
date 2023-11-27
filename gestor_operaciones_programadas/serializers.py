@@ -2,7 +2,7 @@ from rest_framework import serializers
 from gestor_operaciones.serializers import SerializadorDetalleIngreso, SerializadorDetalleGasto
 from gestor_operaciones.models import *
 from gestor_operaciones_programadas.models import *
-
+from datetime import timedelta
 
 class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializer):
     detalle_ingreso = SerializadorDetalleIngreso(many=False)
@@ -28,6 +28,20 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
         etiqueta = validated_data['etiqueta'],
         hora_programada_desde = validated_data['hora_programada_desde']
         )
+
+        lst = validated_data['hora_programada_desde'].split(':')
+        lst = [int(i) for i in lst]
+        h, m, s = lst
+
+        total_time = timedelta(hours=h, minutes=m, seconds=s) + timedelta(hours=6, minutes=0, seconds=0)
+
+        total_seconds = total_time.total_seconds() - total_time.days*86400
+
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+
+        operacion_programada.hora_programada_hasta = f'{int(hours)}:{int(minutes)}:{int(seconds)}'
 
         query_set_dias = DiaSemana.objects.filter(d_id__in=validated_data['dias'])
         lst_dias = list(query_set_dias)
@@ -62,16 +76,6 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
         cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request').user.u_id)
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
         
-        time1_str = validated_data['hora_programada_desde']
-        time2_str = "06:00:00"
-
-        time1 = datetime.datetime.strptime(time1_str, "%H:%M:%S").time()
-        time2 = datetime.datetime.strptime(time2_str, "%H:%M:%S").time()
-
-        total_time = time1 + time2
-        formatted_total_time = total_time.strftime("%H:%M:%S")
-
-
         operacion_programada = OperacionesUsuarioProgramadas.objects.create(
         cu_id = cu_id,
         to_id = to_id,
@@ -79,13 +83,24 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
         etiqueta = validated_data['etiqueta'],
         fecha_operacion = validated_data['fecha_operacion'],
         hora_operacion = validated_data['hora_operacion'],
-        hora_programada_desde = validated_data['hora_programada_desde'],
-        hora_programada_hasta = formatted_total_time
+        hora_programada_desde =validated_data['hora_programada_desde']
         )
 
+        lst = validated_data['hora_programada_desde'].split(':')
+        lst = [int(i) for i in lst]
+        h, m, s = lst
+    
+        total_time = timedelta(hours=h, minutes=m, seconds=s) + timedelta(hours=6, minutes=0, seconds=0)
+
+        operacion_programada.hora_programada_hasta = str(total_time)
+    
         query_set_dias = DiaSemana.objects.filter(d_id__in=validated_data['dias'])
         lst_dias = list(query_set_dias)
         operacion_programada.dias.add(*lst_dias)
+
+
+        operacion_programada.save()
+
 
         scg_id=SubcategoriasGasto.objects.get(pk=detalle_gasto_data['scg_id'])
         DetalleGastoProgramado.objects.create(
@@ -93,12 +108,10 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
         scg_id = scg_id
         )
         
-        operacion_programada.save()
-
         return operacion_programada
     
 
-class SerializadorExtractos(serializers.ModelSerializer):
+class SerializadorOperacionesHabilitadas(serializers.ModelSerializer):
     divisa = serializers.CharField(source='cu_id.divisa')
     tipo_operacion = serializers.CharField(source='to_id.nom_to')
 

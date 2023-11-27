@@ -41,6 +41,6 @@ class VisualizarOperacionesHabilitadas(APIView):
 	authentication_classes = (SessionAuthentication,)
 
 	def get(self, request):
-		extractos = OperacionesUsuarioProgramadas.extractos_operaciones(request.user.u_id)
-		serializer = SerializadorExtractos(extractos, many=True)
+		habilitadas = OperacionesUsuarioProgramadas.operaciones_habilitadas(request.user.u_id)
+		serializer = SerializadorOperacionesHabilitadas(habilitadas, many=True)
 		return Response(serializer.data)

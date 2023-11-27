@@ -1,6 +1,7 @@
 from django.db import models
 from gestor_cartera.models import CarteraUsuario
 from django.utils import timezone
+from .utils import fecha_actual, hora_actual
 
 class CategoriasGasto(models.Model):
     cg_id = models.CharField(max_length=10, primary_key=True, unique=True)
@@ -55,8 +56,9 @@ class OperacionesUsuario(models.Model):
     to_id = models.ForeignKey(TipoOperacion, on_delete=models.PROTECT, db_column='to_id')
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     etiqueta = models.CharField(max_length=50, default='')
-    fecha_operacion = models.DateField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).replace(microsecond=0))
-    hora_operacion = models.TimeField(default=timezone.localtime(timezone.now(), timezone.get_fixed_timezone(-300) ).time().replace(microsecond=0))
+    fecha_operacion = models.DateField(default=fecha_actual)
+    hora_operacion = models.TimeField(default=hora_actual)
+
     def save(self, *args, **kwargs):
         if not self.o_id:
             self.o_id = f"o{OperacionesUsuario.objects.count() + 1}"
