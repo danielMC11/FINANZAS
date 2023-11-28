@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model, login, logout
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import SerializadorRegistroUsuario, SeralizadorLoginUsuario, SerializadorUsuario
 from rest_framework import permissions, status
 from gestor_cartera.models import CarteraUsuario
+from usuarios.models import Usuario
 from django.core.exceptions import ObjectDoesNotExist
 
 class RegistroUsuario(APIView):
@@ -41,8 +41,8 @@ class LogoutUsuario(APIView):
 		return Response(status=status.HTTP_200_OK)
 
 
-class Usuario(APIView):
-	def get(self, request):
-		serializer = SerializadorUsuario(request.user)
+class PerfilUsuario(APIView):
+	def get(self, request, u_id):
+		serializer = SerializadorUsuario(Usuario.objects.get(pk=u_id))
 		return Response({'Usuario': serializer.data}, status=status.HTTP_200_OK)
 

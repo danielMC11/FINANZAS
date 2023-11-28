@@ -133,7 +133,8 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
         
         hora_operacion = validated_data.get('hora_operacion', None)
         fecha_operacion = validated_data.get('fecha_operacion', None)
-
+        operacion = None
+        
         if fecha_operacion and hora_operacion:
             operacion = OperacionesUsuario.objects.create(
             cu_id = cu_id,
@@ -166,7 +167,7 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
             etiqueta = validated_data['etiqueta'],
             cantidad = validated_data['cantidad'],
             )
-            
+
         cu_id.saldo -= validated_data['cantidad']
         cu_id.save()
 

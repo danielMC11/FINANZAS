@@ -7,12 +7,9 @@ from .models import *
 
 
 class RegistrarOperacionProgramadaIngreso(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def post(self, request):
+	def post(self, request, u_id):
 		datos = request.data
-		serializer = SerializadorOperacionesProgramadasUsuarioIngreso(data=datos, context={'request': request}, many = False)
+		serializer = SerializadorOperacionesProgramadasUsuarioIngreso(data=datos, context={'request': u_id}, many = False)
 
 		if serializer.is_valid(raise_exception=True):
 			operacion_programada = serializer.create(datos)
@@ -22,12 +19,9 @@ class RegistrarOperacionProgramadaIngreso(APIView):
 	
 
 class RegistrarOperacionProgramadaGasto(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def post(self, request):
+	def post(self, request, u_id):
 		datos = request.data
-		serializer = SerializadorOperacionesProgramadasUsuarioGasto(data=datos, context={'request': request}, many = False)
+		serializer = SerializadorOperacionesProgramadasUsuarioGasto(data=datos, context={'request': u_id}, many = False)
 
 		if serializer.is_valid(raise_exception=True):
 			operacion_programada = serializer.create(datos)
@@ -37,10 +31,7 @@ class RegistrarOperacionProgramadaGasto(APIView):
 	
 
 class VisualizarOperacionesHabilitadas(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def get(self, request):
-		habilitadas = OperacionesUsuarioProgramadas.operaciones_habilitadas(request.user.u_id)
+	def get(self, request, u_id):
+		habilitadas = OperacionesUsuarioProgramadas.operaciones_habilitadas(u_id)
 		serializer = SerializadorOperacionesHabilitadas(habilitadas, many=True)
 		return Response(serializer.data)

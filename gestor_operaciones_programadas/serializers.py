@@ -6,10 +6,12 @@ from datetime import timedelta
 
 class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializer):
     detalle_ingreso = SerializadorDetalleIngreso(many=False)
+    hora_operacion = serializers.TimeField(required=False)
+    fecha_operacion = serializers.DateField(required=False)
 
     class Meta:
         model = OperacionesUsuarioProgramadas
-        fields = ['to_id', 'cantidad', 'etiqueta', 'hora_programada_desde', 'dias', 'detalle_ingreso']
+        fields = ['to_id', 'cantidad', 'etiqueta', 'fecha_operacion', 'hora_operacion', 'hora_programada_desde', 'dias', 'detalle_ingreso']
 
     
     def validate_cantidad(self, value):
@@ -18,16 +20,50 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
 
     def create(self, validated_data):
         detalle_ingreso_data = validated_data.pop('detalle_ingreso')
-        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request').user.u_id)
+        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
         
-        operacion_programada = OperacionesUsuarioProgramadas.objects.create(
-        cu_id = cu_id,
-        to_id = to_id,
-        cantidad = validated_data['cantidad'],
-        etiqueta = validated_data['etiqueta'],
-        hora_programada_desde = validated_data['hora_programada_desde']
-        )
+        hora_operacion = validated_data.get('hora_operacion', None)
+        fecha_operacion = validated_data.get('fecha_operacion', None)
+        operacion_programada = None
+
+        if fecha_operacion and hora_operacion:
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            hora_operacion = validated_data['hora_operacion'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+
+            )
+        elif fecha_operacion and not hora_operacion:
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+            )
+        elif not fecha_operacion and hora_operacion:
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            hora_operacion = validated_data['hora_operacion'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+            )
+        else:
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+            )
 
         lst = validated_data['hora_programada_desde'].split(':')
         lst = [int(i) for i in lst]
@@ -75,24 +111,15 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
 
     def create(self, validated_data):
         detalle_gasto_data = validated_data.pop('detalle_gasto')
-        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request').user.u_id)
+        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
-        
-        operacion_programada = OperacionesUsuarioProgramadas.objects.create(
-        cu_id = cu_id,
-        to_id = to_id,
-        cantidad = validated_data['cantidad'],
-        etiqueta = validated_data['etiqueta'],
-        fecha_operacion = validated_data['fecha_operacion'],
-        hora_operacion = validated_data['hora_operacion'],
-        hora_programada_desde =validated_data['hora_programada_desde']
-        )
 
         hora_operacion = validated_data.get('hora_operacion', None)
         fecha_operacion = validated_data.get('fecha_operacion', None)
+        operacion_programada = None
 
         if fecha_operacion and hora_operacion:
-            operacion = OperacionesUsuarioProgramadas.objects.create(
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
             cu_id = cu_id,
             to_id = to_id,
             etiqueta = validated_data['etiqueta'],
@@ -103,7 +130,7 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
 
             )
         elif fecha_operacion and not hora_operacion:
-            operacion = OperacionesUsuarioProgramadas.objects.create(
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
             cu_id = cu_id,
             to_id = to_id,
             etiqueta = validated_data['etiqueta'],
@@ -112,7 +139,7 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
             hora_programada_desde =validated_data['hora_programada_desde']
             )
         elif not fecha_operacion and hora_operacion:
-            operacion = OperacionesUsuarioProgramadas.objects.create(
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
             cu_id = cu_id,
             to_id = to_id,
             etiqueta = validated_data['etiqueta'],
@@ -121,7 +148,7 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
             hora_programada_desde =validated_data['hora_programada_desde']
             )
         else:
-            operacion = OperacionesUsuarioProgramadas.objects.create(
+            operacion_programada = OperacionesUsuarioProgramadas.objects.create(
             cu_id = cu_id,
             to_id = to_id,
             etiqueta = validated_data['etiqueta'],
