@@ -61,6 +61,8 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
 
 class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer):
     detalle_gasto = SerializadorDetalleGasto(many=False)
+    hora_operacion = serializers.TimeField(required=False)
+    fecha_operacion = serializers.DateField(required=False)
 
     class Meta:
         model = OperacionesUsuarioProgramadas
@@ -86,13 +88,59 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
         hora_programada_desde =validated_data['hora_programada_desde']
         )
 
+        hora_operacion = validated_data.get('hora_operacion', None)
+        fecha_operacion = validated_data.get('fecha_operacion', None)
+
+        if fecha_operacion and hora_operacion:
+            operacion = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            hora_operacion = validated_data['hora_operacion'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+
+            )
+        elif fecha_operacion and not hora_operacion:
+            operacion = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+            )
+        elif not fecha_operacion and hora_operacion:
+            operacion = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            hora_operacion = validated_data['hora_operacion'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+            )
+        else:
+            operacion = OperacionesUsuarioProgramadas.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            hora_programada_desde =validated_data['hora_programada_desde']
+            )
+
         lst = validated_data['hora_programada_desde'].split(':')
         lst = [int(i) for i in lst]
         h, m, s = lst
     
         total_time = timedelta(hours=h, minutes=m, seconds=s) + timedelta(hours=6, minutes=0, seconds=0)
 
-        operacion_programada.hora_programada_hasta = str(total_time)
+        total_seconds = total_time.total_seconds() - total_time.days*86400
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+
+        operacion_programada.hora_programada_hasta = f'{int(hours)}:{int(minutes)}:{int(seconds)}'
     
         query_set_dias = DiaSemana.objects.filter(d_id__in=validated_data['dias'])
         lst_dias = list(query_set_dias)

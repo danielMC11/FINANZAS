@@ -34,6 +34,8 @@ class SerializadorDetalleIngreso(serializers.ModelSerializer):
 
 class SerializadorOperacionesUsuarioIngreso(serializers.ModelSerializer):
     detalle_ingreso = SerializadorDetalleIngreso(many=False)
+    fecha_operacion = serializers.DateField(required=False)
+    hora_operacion = serializers.TimeField(required=False)
 
     class Meta:
         model = OperacionesUsuario
@@ -48,14 +50,43 @@ class SerializadorOperacionesUsuarioIngreso(serializers.ModelSerializer):
         detalle_ingreso_data = validated_data.pop('detalle_ingreso')
         cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
-        operacion = OperacionesUsuario.objects.create(
-        cu_id = cu_id,
-        to_id = to_id,
-        etiqueta = validated_data['etiqueta'],
-        cantidad = validated_data['cantidad'],
-        fecha_operacion = validated_data['fecha_operacion'],
-        hora_operacion = validated_data['hora_operacion']
-        )
+
+        hora_operacion = validated_data.get('hora_operacion', None)
+        fecha_operacion = validated_data.get('fecha_operacion', None)
+
+        if fecha_operacion and hora_operacion:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            hora_operacion = validated_data['hora_operacion']
+            )
+        elif fecha_operacion and not hora_operacion:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            )
+        elif not fecha_operacion and hora_operacion:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            hora_operacion = validated_data['hora_operacion']
+            )
+        else:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            )
+
 
         cu_id.saldo += validated_data['cantidad']
         cu_id.save()
@@ -78,10 +109,13 @@ class SerializadorDetalleGasto(serializers.ModelSerializer):
 
 class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
     detalle_gasto = SerializadorDetalleGasto(many=False)
+    hora_operacion = serializers.TimeField(required=False)
+    fecha_operacion = serializers.DateField(required=False)
+
 
     class Meta:
         model = OperacionesUsuario
-        fields = ['to_id', 'cantidad', 'etiqueta', 'detalle_gasto']
+        fields = ['to_id', 'cantidad', 'etiqueta', 'fecha_operacion', 'hora_operacion', 'detalle_gasto']
 
     def validate_cantidad(self, value):
         if value <= 0:
@@ -95,13 +129,44 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
         detalle_gasto_data = validated_data.pop('detalle_gasto')
         cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
-        operacion = OperacionesUsuario.objects.create(
-        cu_id = cu_id,
-        to_id = to_id,
-        etiqueta = validated_data['etiqueta'],
-        cantidad = validated_data['cantidad'],
-        )
 
+        
+        hora_operacion = validated_data.get('hora_operacion', None)
+        fecha_operacion = validated_data.get('fecha_operacion', None)
+
+        if fecha_operacion and hora_operacion:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            hora_operacion = validated_data['hora_operacion']
+            )
+        elif fecha_operacion and not hora_operacion:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            fecha_operacion = validated_data['fecha_operacion'],
+            )
+        elif not fecha_operacion and hora_operacion:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            hora_operacion = validated_data['hora_operacion']
+            )
+        else:
+            operacion = OperacionesUsuario.objects.create(
+            cu_id = cu_id,
+            to_id = to_id,
+            etiqueta = validated_data['etiqueta'],
+            cantidad = validated_data['cantidad'],
+            )
+            
         cu_id.saldo -= validated_data['cantidad']
         cu_id.save()
 
