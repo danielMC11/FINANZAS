@@ -46,7 +46,7 @@ class SerializadorOperacionesUsuarioIngreso(serializers.ModelSerializer):
 
     def create(self, validated_data):
         detalle_ingreso_data = validated_data.pop('detalle_ingreso')
-        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request').user.u_id)
+        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
         operacion = OperacionesUsuario.objects.create(
         cu_id = cu_id,
@@ -86,14 +86,14 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
     def validate_cantidad(self, value):
         if value <= 0:
             raise serializers.ValidationError("Monto invalido")
-        cartera=CarteraUsuario.objects.get(u_id=self.context.get('request').user.u_id)
+        cartera=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         if value > cartera.saldo:
             raise serializers.ValidationError("Fondos insuficientes")
         return value
     
     def create(self, validated_data):
         detalle_gasto_data = validated_data.pop('detalle_gasto')
-        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request').user.u_id)
+        cu_id=CarteraUsuario.objects.get(u_id=self.context.get('request'))
         to_id=TipoOperacion.objects.get(pk=validated_data['to_id'])
         operacion = OperacionesUsuario.objects.create(
         cu_id = cu_id,

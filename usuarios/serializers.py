@@ -18,12 +18,9 @@ class SerializadorRegistroUsuario(serializers.ModelSerializer):
 class SeralizadorLoginUsuario(serializers.Serializer):
 	email = serializers.EmailField()
 	password = serializers.CharField()
-
-	@classmethod
+	
 	def comprobar_usuario(cls, datos):
 		usuario = authenticate(username=datos['email'], password=datos['password'])
-		if not usuario:
-			raise ValidationError('Usuario no encontrado')
 		return usuario
 
 

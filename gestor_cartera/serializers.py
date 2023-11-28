@@ -13,7 +13,7 @@ class SerializadorCarteraUsuario(serializers.ModelSerializer):
         
     def create(self, validated_data):
         user = CarteraUsuario.objects.create(
-            u_id=Usuario.objects.get(pk=self.context.get('request').user.u_id),
+            u_id=Usuario.objects.get(pk=self.context.get('request')),
             saldo=validated_data['saldo'],
             divisa=validated_data['divisa'])
         user.save()

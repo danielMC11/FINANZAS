@@ -8,7 +8,6 @@ from gestor_cartera.models import CarteraUsuario
 from django.core.exceptions import ObjectDoesNotExist
 
 class RegistroUsuario(APIView):
-	permission_classes = (permissions.AllowAny,)
 	def post(self, request):
 		datos = request.data
 		serializer = SerializadorRegistroUsuario(data=datos)
@@ -20,25 +19,22 @@ class RegistroUsuario(APIView):
 
 
 class LoginUsuario(APIView):
-	permission_classes = (permissions.AllowAny,)
-	authentication_classes = (SessionAuthentication,)
-	##
 	def post(self, request):
 		datos = request.data
 		serializer = SeralizadorLoginUsuario(data=datos)
 		if serializer.is_valid(raise_exception=True):
 			usuario = serializer.comprobar_usuario(datos)
-			login(request, usuario)
-			try:
-				CarteraUsuario.objects.get(u_id=request.user.u_id)
+			if not usuario:
+				return Response(status=status.HTTP_400_BAD_REQUEST)
+			try:	
+				CarteraUsuario.objects.get(u_id=usuario.u_id)
 			except ObjectDoesNotExist:
-				return Response({'cartera': False}, status=status.HTTP_200_OK)
+				return Response({'u_id': usuario.u_id,'cartera': False}, status=status.HTTP_200_OK)
 			else:
-				return Response({'cartera': True}, status=status.HTTP_200_OK)
+				return Response({'u_id': usuario.u_id, 'cartera': True}, status=status.HTTP_200_OK)
 
 
 class LogoutUsuario(APIView):
-	permission_classes = (permissions.AllowAny,)
 	authentication_classes = ()
 	def post(self, request):
 		logout(request)
@@ -46,9 +42,6 @@ class LogoutUsuario(APIView):
 
 
 class Usuario(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-	##
 	def get(self, request):
 		serializer = SerializadorUsuario(request.user)
 		return Response({'Usuario': serializer.data}, status=status.HTTP_200_OK)

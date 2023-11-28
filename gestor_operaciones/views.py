@@ -8,9 +8,6 @@ from .models import *
 
 
 class VisualizarCategoriasIngreso(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
 	def get(self, request):
 		categorias = CategoriasIngreso.objects.all()
 		serializer = SerializadorCategoriasIngreso(categorias, many=True)
@@ -18,9 +15,6 @@ class VisualizarCategoriasIngreso(APIView):
 	
 
 class VisualizarSubcategoriasIngreso(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
 	def get(self, request):
 		categorias = SubcategoriasIngreso.objects.all()
 		serializer = SerializadorSubcategoriasIngreso(categorias, many=True)
@@ -28,9 +22,6 @@ class VisualizarSubcategoriasIngreso(APIView):
 
 
 class VisualizarCategoriasGasto(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
 	def get(self, request):
 		categorias = CategoriasGasto.objects.all()
 		serializer = SerializadorCategoriasGasto(categorias, many=True)
@@ -38,9 +29,6 @@ class VisualizarCategoriasGasto(APIView):
 	
 
 class VisualizarSubcategoriasGasto(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
 	def get(self, request):
 		categorias = SubcategoriasGasto.objects.all()
 		serializer = SerializadorSubcategoriasGasto(categorias, many=True)
@@ -48,12 +36,9 @@ class VisualizarSubcategoriasGasto(APIView):
 	
 
 class RegistrarOperacionIngreso(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def post(self, request):
+	def post(self, request, u_id):
 		datos = request.data
-		serializer = SerializadorOperacionesUsuarioIngreso(data=datos, context={'request': request}, many = False)
+		serializer = SerializadorOperacionesUsuarioIngreso(data=datos, context={'request': u_id}, many = False)
 
 		if serializer.is_valid(raise_exception=True):
 			operacion = serializer.create(datos)
@@ -63,12 +48,9 @@ class RegistrarOperacionIngreso(APIView):
 
 
 class RegistrarOperacionGasto(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def post(self, request):
+	def post(self, request, u_id):
 		datos = request.data
-		serializer = SerializadorOperacionesUsuarioGasto(data=datos, context={'request': request}, many = False)
+		serializer = SerializadorOperacionesUsuarioGasto(data=datos, context={'request': u_id}, many = False)
 
 		if serializer.is_valid(raise_exception=True):
 			operacion = serializer.create(datos)
@@ -77,28 +59,19 @@ class RegistrarOperacionGasto(APIView):
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class VisualizarExtractos(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def get(self, request):
-		extractos = OperacionesUsuario.extractos_operaciones(request.user.u_id)
+	def get(self, request, u_id):
+		extractos = OperacionesUsuario.extractos_operaciones(u_id)
 		serializer = SerializadorExtractos(extractos, many=True)
 		return Response(serializer.data)
 
 class VisualizarExtractoDetalleIngreso(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def get(self, request, o_id):
-		detalle_extracto_ingreso = OperacionesUsuario.extracto_detalle(request.user.u_id, o_id)
+	def get(self, request, o_id, u_id):
+		detalle_extracto_ingreso = OperacionesUsuario.extracto_detalle(u_id, o_id)
 		serializer = SerializadorExtractoDetalleIngreso(detalle_extracto_ingreso, many=False)
 		return Response(serializer.data)
 	
 class VisualizarExtractoDetalleGasto(APIView):
-	permission_classes = (permissions.IsAuthenticated,)
-	authentication_classes = (SessionAuthentication,)
-
-	def get(self, request, o_id):
-		detalle_extracto_gasto = OperacionesUsuario.extracto_detalle(request.user.u_id, o_id)
+	def get(self, request, o_id, u_id):
+		detalle_extracto_gasto = OperacionesUsuario.extracto_detalle(u_id, o_id)
 		serializer = SerializadorExtractoDetalleGasto(detalle_extracto_gasto, many=False)
 		return Response(serializer.data)
