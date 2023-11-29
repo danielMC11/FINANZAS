@@ -195,3 +195,15 @@ class SerializadorOperacionesHabilitadas(serializers.ModelSerializer):
     class Meta:
         model = OperacionesUsuarioProgramadas
         fields = ('op_id', 'etiqueta', 'cantidad', 'divisa', 'tipo_operacion', 'fecha_operacion', 'hora_operacion', 'hora_programada_desde')
+
+class SerializadorListadoOperacionesProgramadas(serializers.ModelSerializer):
+    divisa = serializers.CharField(source='cu_id.divisa')
+    tipo_operacion = serializers.CharField(source='to_id.nom_to')
+
+    class Meta:
+        model = OperacionesUsuarioProgramadas
+        fields = ('op_id', 'etiqueta', 'cantidad', 'divisa', 'tipo_operacion',
+                  'fecha_operacion', 'hora_operacion',
+                  'hora_programada_desde', 'hora_programada_hasta', 'activo'
+                 )
+        

@@ -21,7 +21,7 @@ class OperacionesUsuarioProgramadas(models.Model):
     fecha_operacion = models.DateField(default=fecha_actual)
     hora_operacion = models.TimeField(default=hora_actual)
     hora_programada_desde = models.TimeField(default=hora_actual)
-    hora_programada_hasta = models.TimeField(default='00:00:00')
+    hora_programada_hasta = models.TimeField(default=adicion_hora_actual)
     dias = models.ManyToManyField(DiaSemana)
     activo = models.BooleanField(default=True)
     
@@ -31,7 +31,7 @@ class OperacionesUsuarioProgramadas(models.Model):
         return super().save(*args, **kwargs)
     
     @classmethod
-    def extractos_operaciones(cls, u_id):
+    def operaciones_programadas(cls, u_id):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         extractos = OperacionesUsuarioProgramadas.objects.filter(cu_id=cartera.cu_id)
         return extractos
@@ -41,9 +41,34 @@ class OperacionesUsuarioProgramadas(models.Model):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         n_dia_actual = dia_semana_actual()
         d_id = f'd{n_dia_actual}'
-        qset_lst = OperacionesUsuarioProgramadas.objects.filter(cu_id=cartera.cu_id, dias= d_id)
+        qset_lst = OperacionesUsuarioProgramadas.objects.filter(cu_id=cartera.cu_id, dias=d_id)
         lst = [i for i in qset_lst if comprobar_hora(i.hora_programada_desde,i.hora_programada_hasta, hora_actual)]
         return lst
+    
+    @classmethod
+    def operacion_info(cls, op_id):
+        operacion_programada = OperacionesUsuarioProgramadas.objects.get(op_id=op_id)
+        if operacion_programada.to_id.nom_to == 'ingreso':
+            dict_registro = {
+            "to_id": operacion_programada.to_id.to_id,
+            "cantidad": operacion_programada.cantidad,
+            "etiqueta": operacion_programada.etiqueta,
+            "detalle_ingreso":{
+            "sci_id": operacion_programada.detalleingresoprogramado.sci_id.sci_id
+            }
+            }
+            return dict_registro
+        else:
+            dict_registro = {
+            "to_id": operacion_programada.to_id.to_id,
+            "cantidad": operacion_programada.cantidad,
+            "etiqueta": operacion_programada.etiqueta,
+            "detalle_gasto":{
+            "scg_id": operacion_programada.detallegastoprogramado.scg_id.scg_id
+            }
+            }
+            return dict_registro
+
 
     class Meta:
         db_table = 'operaciones_usuario_programadas'

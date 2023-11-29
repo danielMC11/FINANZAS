@@ -35,7 +35,6 @@ class LoginUsuario(APIView):
 
 
 class LogoutUsuario(APIView):
-	authentication_classes = ()
 	def post(self, request):
 		logout(request)
 		return Response(status=status.HTTP_200_OK)
