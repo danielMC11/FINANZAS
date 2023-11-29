@@ -71,13 +71,14 @@ class SerializadorOperacionesProgramadasUsuarioIngreso(serializers.ModelSerializ
 
         total_time = timedelta(hours=h, minutes=m, seconds=s) + timedelta(hours=6, minutes=0, seconds=0)
 
-        total_seconds = total_time.total_seconds() - total_time.days*86400
-
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        seconds = total_seconds % 60
-
-        operacion_programada.hora_programada_hasta = f'{int(hours)}:{int(minutes)}:{int(seconds)}'
+        if total_time.days == 0:
+            hours = total_time.total_seconds() // 3600
+            minutes = (total_time.total_seconds() % 3600) // 60
+            seconds = total_time.total_seconds() % 60
+            operacion_programada.hora_programada_hasta = f'{int(hours)}:{int(minutes)}:{int(seconds)}'
+        else:
+            operacion_programada.hora_programada_hasta = '23:59:59'
+    
 
         query_set_dias = DiaSemana.objects.filter(d_id__in=validated_data['dias'])
         lst_dias = list(query_set_dias)
@@ -162,12 +163,13 @@ class SerializadorOperacionesProgramadasUsuarioGasto(serializers.ModelSerializer
     
         total_time = timedelta(hours=h, minutes=m, seconds=s) + timedelta(hours=6, minutes=0, seconds=0)
 
-        total_seconds = total_time.total_seconds() - total_time.days*86400
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        seconds = total_seconds % 60
-
-        operacion_programada.hora_programada_hasta = f'{int(hours)}:{int(minutes)}:{int(seconds)}'
+        if total_time.days == 0:
+            hours = total_time.total_seconds() // 3600
+            minutes = (total_time.total_seconds() % 3600) // 60
+            seconds = total_time.total_seconds() % 60
+            operacion_programada.hora_programada_hasta = f'{int(hours)}:{int(minutes)}:{int(seconds)}'
+        else:
+            operacion_programada.hora_programada_hasta = '23:59:59'
     
         query_set_dias = DiaSemana.objects.filter(d_id__in=validated_data['dias'])
         lst_dias = list(query_set_dias)

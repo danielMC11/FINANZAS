@@ -27,9 +27,4 @@ def comprobar_hora(h_desde, h_hasta, hora_actual):
 
     if h_actual >= h_desde and h_actual <= h_hasta:
          return True
-    elif h_desde > h_hasta:
-        x = datetime.strptime('23:59:59', '%H:%M:%S').time()
-        y = datetime.strptime('00:00:00', '%H:%M:%S').time()
-        if (h_actual >= h_desde and h_actual <= x) or (h_actual >= y and h_actual <= h_hasta):
-             return True
     return False
