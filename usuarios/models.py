@@ -4,9 +4,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 
 class AdminUsuarios(BaseUserManager):
-	def crear_usuario(self, email, password=None,**extra_fields):
+	def crear_usuario(self, email, password=None):
 		email = self.normalize_email(email)
-		user = self.model(email=email, **extra_fields)
+		user = self.model(email=email)
 		user.set_password(password)
 		user.save()
 		return user

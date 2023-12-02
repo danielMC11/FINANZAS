@@ -7,9 +7,11 @@ from .models import *
 
 
 class CrearCartera(APIView):	
-	def post(self, request, u_id):
+	permission_classes = (permissions.IsAuthenticated,)
+	authentication_classes = (SessionAuthentication,)
+	def post(self, request):
 		datos = request.data
-		serializer = SerializadorCarteraUsuario(data=datos, context={'request': u_id}, many = False)
+		serializer = SerializadorCarteraUsuario(data=datos, context={'request': request.user.u_id}, many = False)
 		if serializer.is_valid(raise_exception=True):
 			cartera = serializer.create(datos)
 			if cartera:

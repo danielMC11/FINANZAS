@@ -3,12 +3,23 @@ from usuarios.models import Usuario
 from django.utils import timezone
 
 
+class Divisas(models.Model):
+    div_id = models.CharField(max_length=10, primary_key=True)
+    nom_div = models.CharField(max_length=3)
+    pais = models.CharField(max_length=20, null=True)
+
+    def __str__(self):
+        return f'{self.nom_div}'
+    
+    class Meta:
+        db_table = 'divisas'
+
 
 class CarteraUsuario(models.Model):
     cu_id = models.CharField(max_length=10, primary_key=True)
     u_id = models.OneToOneField(Usuario, on_delete=models.CASCADE, db_column='u_id')
     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    divisa = models.CharField(max_length=3)
+    div_id = models.ForeignKey(Divisas, on_delete=models.PROTECT, db_column='div_id')
 
     def save(self, *args, **kwargs):
         if not self.cu_id:
@@ -20,3 +31,5 @@ class CarteraUsuario(models.Model):
 
     class Meta:
         db_table = 'cartera_usuario'
+
+

@@ -21,6 +21,8 @@ class SeralizadorLoginUsuario(serializers.Serializer):
 	
 	def comprobar_usuario(cls, datos):
 		usuario = authenticate(username=datos['email'], password=datos['password'])
+		if not usuario:
+			raise ValidationError('Usuario no encontrado')
 		return usuario
 
 

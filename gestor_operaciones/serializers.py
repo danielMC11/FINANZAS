@@ -186,7 +186,7 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
         return operacion
 
 class SerializadorExtractos(serializers.ModelSerializer):
-    divisa = serializers.CharField(source='cu_id.divisa')
+    divisa = serializers.CharField(source='cu_id.div_id.nom_div')
     tipo_operacion = serializers.CharField(source='to_id.nom_to')
 
     class Meta:
@@ -198,7 +198,7 @@ class SerializadorExtractoDetalleIngreso(serializers.ModelSerializer):
     tipo_operacion = serializers.CharField(max_length=30, source='to_id.nom_to')
     subcategoria_ingreso = serializers.CharField(max_length=5, source='detalleingreso.sci_id.nom_sci')
     categoria_ingreso = serializers.CharField(max_length=50, source='detalleingreso.sci_id.ci_id.nom_ci')
-    divisa = serializers.CharField(max_length=3, source='cu_id.divisa')
+    divisa = serializers.CharField(max_length=3, source='cu_id.div_id.nom_div')
 
     class Meta:
         model = OperacionesUsuario
@@ -210,7 +210,7 @@ class SerializadorExtractoDetalleGasto(serializers.ModelSerializer):
     tipo_operacion = serializers.CharField(max_length=30, source='to_id.nom_to')
     subcategoria_gasto = serializers.CharField(max_length=5, source='detallegasto.scg_id.nom_scg')
     categoria_gasto = serializers.CharField(max_length=50, source='detallegasto.scg_id.cg_id.nom_cg')
-    divisa = serializers.CharField(max_length=3, source='cu_id.divisa')
+    divisa = serializers.CharField(max_length=3, source='cu_id.div_id.nom_div')
 
     class Meta:
         model = OperacionesUsuario
