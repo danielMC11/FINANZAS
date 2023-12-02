@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'usuarios',
     'gestor_cartera',
     'gestor_operaciones',
-    'gestor_operaciones_programadas'
+    'gestor_operaciones_programadas',
+    'gestor_proyecciones'
 ]
 
 MIDDLEWARE = [

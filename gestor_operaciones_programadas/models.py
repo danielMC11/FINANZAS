@@ -1,7 +1,7 @@
 from django.db import models
 from gestor_cartera.models import CarteraUsuario
 from gestor_operaciones.models import TipoOperacion, SubcategoriasGasto, SubcategoriasIngreso
-from gestor_operaciones.utils import dia_semana_actual, fecha_actual, hora_actual, adicion_hora_actual, comprobar_hora
+from gestor_operaciones.utils import dia_semana_actual, fecha_actual, hora_actual, adicion_hora_actual
 from django.utils import timezone
 from datetime import datetime, timedelta
 
@@ -41,9 +41,8 @@ class OperacionesUsuarioProgramadas(models.Model):
         cartera=CarteraUsuario.objects.get(u_id=u_id)
         n_dia_actual = dia_semana_actual()
         d_id = f'd{n_dia_actual}'
-        qset_lst = OperacionesUsuarioProgramadas.objects.filter(cu_id=cartera.cu_id, dias=d_id)
-        lst = [i for i in qset_lst if comprobar_hora(i.hora_programada_desde,i.hora_programada_hasta, hora_actual)]
-        return lst
+        qset_lst = OperacionesUsuarioProgramadas.objects.filter(cu_id=cartera.cu_id, dias=d_id, hora_programada_desde__lte=hora_actual(), hora_programada_hasta__gte=hora_actual())
+        return qset_lst
     
     @classmethod
     def operacion_info(cls, op_id):

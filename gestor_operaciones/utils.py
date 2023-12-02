@@ -7,6 +7,13 @@ def dia_semana_actual():
 def fecha_actual():
       return str(datetime.now().date())
 
+def adicion_fecha_actual():
+    current_date = datetime.now()
+    next_month_date = current_date + timedelta(days=30)
+    formatted_date = next_month_date.strftime("%Y-%m-%d")
+    return str(formatted_date)
+
+
 def hora_actual():
     return str(datetime.now().time().replace(microsecond=0))
 
