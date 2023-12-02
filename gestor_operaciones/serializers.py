@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import *
-
+from gestor_proyecciones.models import ProyeccionesFinancieras
 
 
 
@@ -99,6 +99,8 @@ class SerializadorOperacionesUsuarioIngreso(serializers.ModelSerializer):
         
         operacion.save()
 
+        ProyeccionesFinancieras.progreso_proyeccion(operacion)
+
         return operacion
     
 
@@ -178,6 +180,8 @@ class SerializadorOperacionesUsuarioGasto(serializers.ModelSerializer):
         )
 
         operacion.save()
+
+        ProyeccionesFinancieras.progreso_proyeccion(operacion)
 
         return operacion
 

@@ -14,14 +14,3 @@ class DetalleGastoProgramadoInline(admin.StackedInline):
 class OperacionesProgramadasAdmin(admin.ModelAdmin):
     exclude = ['op_id']
     inlines = (DetalleIngresoProgramadoInline, DetalleGastoProgramadoInline)
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        cantidad = form.cleaned_data.get('cantidad')  
-        cartera = obj.cu_id
-        operacion = str(form.cleaned_data.get('to_id'))
-        if operacion == 'ingreso': 
-            cartera.saldo += cantidad
-        elif operacion == 'gasto':
-            cartera.saldo -= cantidad
-        cartera.save()
